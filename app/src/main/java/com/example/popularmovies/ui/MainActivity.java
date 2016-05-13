@@ -1,9 +1,12 @@
 package com.example.popularmovies.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.popularmovies.Constants;
@@ -69,14 +72,30 @@ public class MainActivity extends AppCompatActivity {
                         page.total_pages = object.getInt("total_pages");
                         page.total_results = object.getInt("total_results");
                         JSONArray jsonArr = object.getJSONArray("results");
-                        ArrayList<Movie> results = new ArrayList<Movie>();
+                        page.results = new ArrayList<Movie>();
                         for (int i = 0; i < jsonArr.length(); i++) {
+                            JSONObject movieJson = jsonArr.getJSONObject(i);
                             Movie movie = new Movie();
-                                    movie.poster_path = jsonArr.getJSONObject(i).getString("poster_path");
-
-                            results.add(movie);
+                                    movie.poster_path = movieJson.getString("poster_path");
+                                    movie.adult = movieJson.getBoolean("adult");
+                            movie.overview = movieJson.getString("overview");
+                            movie.release_date = movieJson.getString("release_date");
+                            movie.original_title = movieJson.getString("original_title");
+                            movie.original_language = movieJson.getString("original_language");
+                            movie.title = movieJson.getString("title");
+                            movie.backdrop_path = movieJson.getString("backdrop_path");
+                            movie.popularity = movieJson.getDouble("popularity");
+                            movie.vote_count = movieJson.getInt("vote_count");
+                            movie.video = movieJson.getBoolean("video");
+                            movie.vote_average = movieJson.getDouble("vote_average");
+                            movie.genre_ids = new ArrayList<>();
+                            JSONArray genreArr = movieJson.getJSONArray("genre_ids");
+                            for (int j = 0; j < genreArr.length(); j++) {
+                                Integer genreJsonObj = genreArr.getInt(j);
+                                movie.genre_ids.add(genreJsonObj);
+                            }
+                            page.results.add(movie);
                         }
-                        page.results = results;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -100,5 +119,22 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),2);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+            getMenuInflater().inflate(R.menu.menu_main_activity,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.setting:
+                startActivity(new Intent(this,SettingActivity.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

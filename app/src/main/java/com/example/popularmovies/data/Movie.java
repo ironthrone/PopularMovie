@@ -1,11 +1,12 @@
 package com.example.popularmovies.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2016/5/10.
  */
-public class Movie {
+public class Movie implements Serializable{
     public String poster_path;
     public boolean adult;
     public String overview;

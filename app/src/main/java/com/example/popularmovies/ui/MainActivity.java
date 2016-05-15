@@ -1,13 +1,15 @@
 package com.example.popularmovies.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
@@ -28,17 +30,37 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String TAG = this.getClass().getSimpleName();
     private RecyclerView mRecyclerView;
+    private String mSort;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSort = getSort();
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler);
         initRecyclerView();
         loadData();
     }
 
+    private String getSort(){
+        SharedPreferences sharePref = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharePref.getString("sort",getString(R.string.pref_default_sort_by));
+
+    }
+
     private void initRecyclerView() {
+    }
+
+    @Override
+    protected void onResume() {
+        if(!mSort.equals(getSort())){
+            mSort = getSort();
+            loadData();
+        }
+        super.onResume();
     }
 
     private void loadData() {
@@ -47,13 +69,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Constants.BASE_URL + "movie/popular?api_key=" + Constants.API_KEY );
+                    URL url = new URL(Constants.BASE_URL + "movie/" + mSort + "?api_key=" + Constants.API_KEY );
                     HttpURLConnection connection =(HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(3000);
                     connection.connect();
                     int code = connection.getResponseCode();
                     if(code == 404){
-                        Toast.makeText(MainActivity.this, "No Resource Founded", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG,"No Resource Founded");
                     }
                     if(code == 200){
                              InputStream is = connection.getInputStream();

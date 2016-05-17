@@ -1,7 +1,11 @@
 package com.example.popularmovies.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +19,7 @@ import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
 import com.example.popularmovies.data.Movie;
 import com.example.popularmovies.data.MoviePage;
+import com.example.popularmovies.util.NetworkUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private RecyclerView mRecyclerView;
     private String mSort;
+    private NetworkChangeReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,21 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler);
         initRecyclerView();
         loadData();
+        registerNetworkChangeReceiver();
+    }
+
+    private void registerNetworkChangeReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
+        mReceiver = new NetworkChangeReceiver();
+        registerReceiver(mReceiver,intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
 
     private String getSort(){
@@ -63,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private void loadData() {
+    protected void loadData() {
 
         new Thread(){
             @Override
@@ -158,5 +179,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public class NetworkChangeReceiver extends BroadcastReceiver {
+        public NetworkChangeReceiver() {
+            super();
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int status = NetworkUtil.getConnectivityStatus(context);
+            if(status != NetworkUtil.TYPE_NO_CONNECT){
+                loadData();
+            }
+
+        }
     }
 }

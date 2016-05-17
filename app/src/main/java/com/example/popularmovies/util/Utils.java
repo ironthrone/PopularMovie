@@ -1,4 +1,4 @@
-package com.example.popularmovies;
+package com.example.popularmovies.util;
 
 /**
  * Created by Administrator on 2016/5/10.

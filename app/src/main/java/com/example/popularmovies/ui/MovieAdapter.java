@@ -1,7 +1,6 @@
 package com.example.popularmovies.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     private static Activity mContext;
     private ArrayList<Movie> mMovies;
+    private OnItemClickListener mOnItemClickListener;
+
     public MovieAdapter(Activity context, ArrayList<Movie> movies) {
         mContext = context;
         mMovies = movies;
@@ -41,9 +42,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, DetailActivity.class);
-                    intent.putExtra("data",mMovies.get(position));
-                    mContext.startActivity(intent);
+                    if(mOnItemClickListener != null){
+                    mOnItemClickListener.onItemClick(mMovies.get(position));
+
+                    }
                 }
             });
     }
@@ -63,5 +65,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             imageView = (ImageView) itemView.findViewById(R.id.image);
         }
 
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(Movie movie);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mOnItemClickListener = listener;
     }
 }

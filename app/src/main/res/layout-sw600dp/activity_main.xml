@@ -9,7 +9,13 @@
     <fragment
         android:id="@+id/main_frag"
         class="com.example.popularmovies.ui.MainFragment"
-        android:layout_width="match_parent"
+        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"/>
+    <FrameLayout
+        android:id="@+id/detail_container"
+        android:layout_weight="3"
+        android:layout_width="0dp"
         android:layout_height="match_parent"/>
 
 </LinearLayout>

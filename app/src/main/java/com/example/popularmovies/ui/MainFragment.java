@@ -72,7 +72,7 @@ public class MainFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Constants.BASE_URL + "movie/" + mSort + "?api_key=" + Constants.API_KEY );
+                    URL url = new URL(Constants.API_BASE_URL + "movie/" + mSort + "?api_key=" + Constants.API_KEY );
                     HttpURLConnection connection =(HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(3000);
                     connection.connect();
@@ -106,6 +106,7 @@ public class MainFragment extends Fragment {
                             movie.overview = movieJson.getString("overview");
                             movie.release_date = movieJson.getString("release_date");
                             movie.original_title = movieJson.getString("original_title");
+                            movie.id = movieJson.getInt("id");
                             movie.original_language = movieJson.getString("original_language");
                             movie.title = movieJson.getString("title");
                             movie.backdrop_path = movieJson.getString("backdrop_path");

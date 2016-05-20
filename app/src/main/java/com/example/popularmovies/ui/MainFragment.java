@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
 import com.example.popularmovies.data.Movie;
-import com.example.popularmovies.data.MoviePage;
 import com.example.popularmovies.util.HttpUtil;
 import com.example.popularmovies.util.SPUtils;
 
@@ -22,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +32,7 @@ public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private String mSort;
+    private List<Movie> mMovies = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,7 +47,12 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         mSort = SPUtils.getSort(getActivity());
+        if(savedInstanceState == null){
         loadData();
+        }else {
+            mMovies = (ArrayList)savedInstanceState.getSerializable("data");
+            showData(mMovies);
+        }
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -58,6 +64,12 @@ public class MainFragment extends Fragment {
             loadData();
         }
         super.onResume();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("data",(ArrayList)mMovies);
     }
 
     protected void loadData() {
@@ -72,15 +84,11 @@ public class MainFragment extends Fragment {
                     if(jsonStr != null){
 
 
-                        JSONObject object = new JSONObject(jsonStr);
-                        final MoviePage page = new MoviePage();
-                        page.page = object.getInt("page");
-                        page.total_pages = object.getInt("total_pages");
-                        page.total_results = object.getInt("total_results");
-                        JSONArray jsonArr = object.getJSONArray("results");
-                        page.results = new ArrayList<Movie>();
-                        for (int i = 0; i < jsonArr.length(); i++) {
-                            JSONObject movieJson = jsonArr.getJSONObject(i);
+                        JSONObject root = new JSONObject(jsonStr);
+                        JSONArray json_result = root.getJSONArray("results");
+                        mMovies.clear();
+                        for (int i = 0; i < json_result.length(); i++) {
+                            JSONObject movieJson = json_result.getJSONObject(i);
                             Movie movie = new Movie();
                             movie.poster_path = movieJson.getString("poster_path");
                             movie.adult = movieJson.getBoolean("adult");
@@ -101,12 +109,13 @@ public class MainFragment extends Fragment {
                                 Integer genreJsonObj = genreArr.getInt(j);
                                 movie.genre_ids.add(genreJsonObj);
                             }
-                            page.results.add(movie);
+                            mMovies.add(movie);
                         }
+                        if(getActivity() == null) return;
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                showData(page);
+                                showData(mMovies);
 
                             }
                         });
@@ -120,8 +129,8 @@ public class MainFragment extends Fragment {
 
     }
 
-    private void showData(MoviePage page) {
-        MovieAdapter adapter = new MovieAdapter(getActivity(),page.results);
+    private void showData(List<Movie> movies) {
+        MovieAdapter adapter = new MovieAdapter(getActivity(),movies);
         adapter.setOnItemClickListener((MainActivity)getActivity());
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(),2);
         mRecyclerView.setLayoutManager(layoutManager);

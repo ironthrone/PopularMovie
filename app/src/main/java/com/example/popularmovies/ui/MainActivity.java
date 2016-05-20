@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.OnIt
 
         if(findViewById(R.id.detail_container) != null){
             mTwoPane = true;
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.detail_container,)
         }
         registerNetworkChangeReceiver();
     }
@@ -100,10 +98,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.OnIt
         @Override
         public void onReceive(Context context, Intent intent) {
             int status = NetworkUtil.getConnectivityStatus(context);
-            if(status != NetworkUtil.TYPE_NO_CONNECT){
+            if(NetworkUtil.lastStatus == NetworkUtil.TYPE_NO_CONNECT && status != NetworkUtil.TYPE_NO_CONNECT){
+
                 mMainFrag.loadData();
             }
-
+            NetworkUtil.setLastStatus(status);
         }
     }
 }

@@ -12,6 +12,12 @@ public class NetworkUtil {
     public static final int TYPE_MOBILE = 2;
     public static final int TYPE_NO_CONNECT = 0;
 
+    public static int lastStatus = 0;
+
+    public static  void setLastStatus(int status){
+        lastStatus = status;
+    }
+
     public static int getConnectivityStatus(Context context){
         int status = TYPE_NO_CONNECT;
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);

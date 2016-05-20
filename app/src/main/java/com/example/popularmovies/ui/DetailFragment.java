@@ -108,7 +108,7 @@ public class DetailFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.share){
-            if(mTrailers.size() >= 0) {
+            if(mTrailers.size() > 0) {
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_SEND);
@@ -152,7 +152,8 @@ public class DetailFragment extends Fragment {
     }
 
     private void addTrailerView(final Trailer trailer){
-//        getActivity()
+        if(getActivity() == null) return;
+
         View trailerView = getActivity().getLayoutInflater().inflate(R.layout.item_trailer,null);
         ((TextView)trailerView.findViewById(R.id.trailer_name)).setText(trailer.name);
         trailerView.setOnClickListener(new View.OnClickListener() {
@@ -168,6 +169,7 @@ public class DetailFragment extends Fragment {
     }
 
     private void addReviewView(Review review){
+        if(getActivity() == null) return;
         View reviewView = getActivity().getLayoutInflater().inflate(R.layout.item_review,null);
         ((TextView)reviewView.findViewById(R.id.review_content)).setText(review.content);
         ((TextView)reviewView.findViewById(R.id.review_author)).setText("Author: " + review.author);

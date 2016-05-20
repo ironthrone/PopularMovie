@@ -1,5 +1,7 @@
 package com.example.popularmovies.ui;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,15 +18,12 @@ import com.example.popularmovies.R;
 import com.example.popularmovies.data.Movie;
 import com.example.popularmovies.data.Review;
 import com.example.popularmovies.data.Trailer;
+import com.example.popularmovies.util.HttpUtil;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +75,7 @@ public class DetailFragment extends Fragment {
     }
 
     private void getReviews() {
+        new ReviewTask().execute(mMovie.id);
     }
 
     private void getTrailer() {
@@ -93,27 +93,76 @@ public class DetailFragment extends Fragment {
     }
 
 
+    private void addTrailerView(final Trailer trailer){
+//        getActivity()
+        View trailerView = getActivity().getLayoutInflater().inflate(R.layout.item_trailer,null);
+        ((TextView)trailerView.findViewById(R.id.trailer_name)).setText(trailer.name);
+        trailerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://www.youtube.com/watch?v=" + trailer.key));
+                startActivity(intent);
+            }
+        });
+        mTrailerContainer.addView(trailerView);
+    }
+
+    private void addReviewView(Review review){
+        View reviewView = getActivity().getLayoutInflater().inflate(R.layout.item_review,null);
+        ((TextView)reviewView.findViewById(R.id.review_content)).setText(review.content);
+        ((TextView)reviewView.findViewById(R.id.review_author)).setText(review.author);
+        mReviewContainer.addView(reviewView);
+    }
+
+    private class ReviewTask extends AsyncTask<Integer,Void,List<Review>>{
+
+        @Override
+        protected List<Review> doInBackground(Integer... params) {
+                try{
+                String urlStr = Constants.API_BASE_URL + "movie/" + params[0] + "/reviews?api_key="
+                + Constants.API_KEY;
+            String jsonStr = HttpUtil.getJsonStr(urlStr);
+            if(jsonStr != null){
+
+            JSONObject rootJson = new JSONObject(jsonStr);
+            JSONArray json_results = rootJson.getJSONArray("results");
+                    for (int i = 0; i < json_results.length(); i++) {
+                        JSONObject object = json_results.getJSONObject(i);
+                        Review review = new Review();
+                        review.id = object.getString("id");
+                        review.author = object.getString("author");
+                        review.content = object.getString("content");
+                        review.url = object.getString("url");
+                        mReviews.add(review);
+                    }
+            }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            return mReviews;
+        }
+
+        @Override
+        protected void onPostExecute(List<Review> reviews) {
+            super.onPostExecute(reviews);
+            for(Review review:reviews){
+                addReviewView(review);
+            }
+        }
+    }
     private class TrailerTask extends AsyncTask<Integer,Void,List<Trailer>> {
 
 
         @Override
         protected List<Trailer> doInBackground(Integer... params) {
             try {
-                URL url = new URL(Constants.API_BASE_URL + "movie/"
-                + mMovie.id + "/videos?api_key=" + Constants.API_KEY);
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                connection.connect();
-                int code = connection.getResponseCode();
-                if(code != 200){
-                    return mTrailers;
-                }
-                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuffer sb = new StringBuffer();
-                String str;
-                while ((str = br.readLine()) != null){
-                sb.append(str);
-                }
-                String jsonStr = sb.toString();
+                String urlStr = Constants.API_BASE_URL + "movie/"
+                + mMovie.id + "/videos?api_key=" + Constants.API_KEY;
+                String jsonStr = HttpUtil.getJsonStr(urlStr);
+                if(jsonStr != null){
 
                 JSONObject rootJson = new JSONObject(jsonStr);
                 JSONArray json_result = rootJson.getJSONArray("results");
@@ -127,8 +176,9 @@ public class DetailFragment extends Fragment {
                     trailer.site = json_trailer.getString("site");
                     mTrailers.add(trailer);
                 }
+                }
             }catch (Exception e){
-
+                e.printStackTrace();
             }
             return mTrailers;
         }
@@ -142,11 +192,6 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    private void addTrailerView(Trailer trailer){
-        View trailerView = getActivity().getLayoutInflater().inflate(R.layout.item_trailer,null);
-        ((TextView)trailerView.findViewById(R.id.trailer_name)).setText(trailer.name);
-        mTrailerContainer.addView(trailerView);
-    }
 
 
 }

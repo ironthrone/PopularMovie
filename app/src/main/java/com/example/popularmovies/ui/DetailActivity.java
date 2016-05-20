@@ -17,12 +17,15 @@ public class DetailActivity extends AppCompatActivity {
 
         Movie movie = (Movie)getIntent().getSerializableExtra("data");
 
+        if(savedInstanceState == null){
+
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
         args.putSerializable("data",movie);
         fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction().replace(R.id.detail_container_detail,
                     fragment).commit();
+        }
     }
 
 

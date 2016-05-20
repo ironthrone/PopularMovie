@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +14,13 @@ import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
 import com.example.popularmovies.data.Movie;
 import com.example.popularmovies.data.MoviePage;
+import com.example.popularmovies.util.HttpUtil;
 import com.example.popularmovies.util.SPUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -72,24 +66,11 @@ public class MainFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Constants.API_BASE_URL + "movie/" + mSort + "?api_key=" + Constants.API_KEY );
-                    HttpURLConnection connection =(HttpURLConnection) url.openConnection();
-                    connection.setConnectTimeout(3000);
-                    connection.connect();
-                    int code = connection.getResponseCode();
-                    if(code == 404){
-                        Log.i(TAG,"No Resource Founded");
-                    }
-                    if(code == 200){
-                        InputStream is = connection.getInputStream();
-                        Reader reader = new InputStreamReader(is);
 
-                        StringBuilder strBuilder = new StringBuilder();
-                        char[] chars = new char[10];
-                        while(reader.read(chars) != -1){
-                            strBuilder.append(chars);
-                        }
-                        String jsonStr = strBuilder.toString();
+                    String urlStr = Constants.API_BASE_URL + "movie/" + mSort + "?api_key=" + Constants.API_KEY ;
+                    String jsonStr = HttpUtil.getJsonStr(urlStr);
+                    if(jsonStr != null){
+
 
                         JSONObject object = new JSONObject(jsonStr);
                         final MoviePage page = new MoviePage();
@@ -130,9 +111,8 @@ public class MainFragment extends Fragment {
                             }
                         });
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+
+                }  catch (JSONException e) {
                     e.printStackTrace();
                 }
             }

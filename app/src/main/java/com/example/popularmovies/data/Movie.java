@@ -21,4 +21,5 @@ public class Movie implements Serializable{
             public int vote_count;
             public boolean video;
             public double vote_average;
+    public boolean favorite;
 }

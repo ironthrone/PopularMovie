@@ -11,7 +11,7 @@ import com.example.popularmovies.R;
 import com.example.popularmovies.data.Movie;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/5/10.
@@ -19,10 +19,10 @@ import java.util.ArrayList;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
     private static Activity mContext;
-    private ArrayList<Movie> mMovies;
+    private List<Movie> mMovies;
     private OnItemClickListener mOnItemClickListener;
 
-    public MovieAdapter(Activity context, ArrayList<Movie> movies) {
+    public MovieAdapter(Activity context, List<Movie> movies) {
         mContext = context;
         mMovies = movies;
     }

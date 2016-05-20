@@ -9,12 +9,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
+import com.example.popularmovies.data.DBOperator;
 import com.example.popularmovies.data.Movie;
 import com.example.popularmovies.data.Review;
 import com.example.popularmovies.data.Trailer;
@@ -45,6 +47,7 @@ public class DetailFragment extends Fragment {
     private TextView mRatingTV;
     private TextView mSynopsisTV;
     private ImageView mPosterIV;
+    private Button mFavoriteBT;
 
     private Movie mMovie;
 
@@ -60,6 +63,16 @@ public class DetailFragment extends Fragment {
         mRatingTV = (TextView)rootView.findViewById(R.id.rating);
         mSynopsisTV = (TextView)rootView.findViewById(R.id.synopsis);
         mPosterIV = (ImageView) rootView.findViewById(R.id.poster);
+        mFavoriteBT = (Button) rootView.findViewById(R.id.favorite);
+
+        mFavoriteBT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMovie.favorite = !mMovie.favorite;
+                DBOperator.getInstance(getActivity()).insert(mMovie);
+        refreshFavoriteBT(mMovie.favorite);
+            }
+        });
         mTrailerContainer = (LinearLayout)rootView.findViewById(R.id.trailer_container);
         mReviewContainer = (LinearLayout)rootView.findViewById(R.id.review_container);
         return rootView;
@@ -69,6 +82,7 @@ public class DetailFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mMovie = (Movie) getArguments().getSerializable("data");
+        mMovie.favorite = DBOperator.getInstance(getActivity()).isFavorite(mMovie.id);
         showData();
         getTrailer();
         getReviews();
@@ -83,15 +97,25 @@ public class DetailFragment extends Fragment {
     }
 
     private void showData() {
-        mTitleTV.setText(mMovie.original_title);
+        mTitleTV.setText(mMovie.title);
         mResDateTV.setText(mMovie.release_date);
         mRatingTV.setText(mMovie.vote_average + "/10");
         mSynopsisTV.setText(mMovie.overview);
         Picasso.with(getActivity())
                 .load(Constants.BASE_POSTER_URL + mMovie.poster_path)
                 .into(mPosterIV);
+        refreshFavoriteBT(mMovie.favorite);
     }
 
+    private void refreshFavoriteBT(boolean favorite){
+        if(favorite){
+            mFavoriteBT.setText("Remove Favorite");
+        }else{
+            mFavoriteBT.setText("Mark As\nFavorite");
+
+        }
+
+    }
 
     private void addTrailerView(final Trailer trailer){
 //        getActivity()
@@ -112,7 +136,7 @@ public class DetailFragment extends Fragment {
     private void addReviewView(Review review){
         View reviewView = getActivity().getLayoutInflater().inflate(R.layout.item_review,null);
         ((TextView)reviewView.findViewById(R.id.review_content)).setText(review.content);
-        ((TextView)reviewView.findViewById(R.id.review_author)).setText(review.author);
+        ((TextView)reviewView.findViewById(R.id.review_author)).setText("Author: " + review.author);
         mReviewContainer.addView(reviewView);
     }
 

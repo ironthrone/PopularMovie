@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.OnIt
             int status = NetworkUtil.getConnectivityStatus(context);
             if(NetworkUtil.lastStatus == NetworkUtil.TYPE_NO_CONNECT && status != NetworkUtil.TYPE_NO_CONNECT){
 
-                mMainFrag.loadData();
+                mMainFrag.loadRemoteData();
             }
             NetworkUtil.setLastStatus(status);
         }

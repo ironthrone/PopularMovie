@@ -47,7 +47,7 @@
                         android:id="@+id/release_date"
                         android:layout_toRightOf="@id/poster"
                         tools:text="2016.5.13"
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                     <TextView
@@ -57,6 +57,14 @@
                         android:layout_marginTop="@dimen/text_line_distance"
                         tools:text="9.5/10"
                         style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <Button
+                        android:id="@+id/favorite"
+                        android:text="Mark As\nFavorite"
+                        style="@style/TextAppearance.AppCompat.Button"
+                        android:layout_alignLeft="@id/release_date"
+                        android:layout_below="@id/rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </RelativeLayout>
@@ -74,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"/>
             <TextView
-                android:text="Trailers"
+                android:text="Trailers:"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 style="@style/TextAppearance.AppCompat.Headline"
@@ -87,7 +95,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
-                android:text="Reviews"
+                android:text="Reviews:"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
+import com.example.popularmovies.data.DBOperator;
 import com.example.popularmovies.data.Movie;
 import com.example.popularmovies.util.HttpUtil;
 import com.example.popularmovies.util.SPUtils;
@@ -48,7 +49,7 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         mSort = SPUtils.getSort(getActivity());
         if(savedInstanceState == null){
-        loadData();
+        loadData(mSort);
         }else {
             mMovies = (ArrayList)savedInstanceState.getSerializable("data");
             showData(mMovies);
@@ -59,9 +60,10 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onResume() {
-        if(!mSort.equals(SPUtils.getSort(getActivity()))){
-            mSort = SPUtils.getSort(getActivity());
-            loadData();
+        String currSort = SPUtils.getSort(getActivity());
+        if(!mSort.equals(currSort)){
+            mSort = currSort;
+            loadData(mSort);
         }
         super.onResume();
     }
@@ -72,7 +74,18 @@ public class MainFragment extends Fragment {
         outState.putSerializable("data",(ArrayList)mMovies);
     }
 
-    protected void loadData() {
+    private void loadData(String sort){
+        String[] sorts = getResources().getStringArray(R.array.pref_sort_entries_value);
+        if(sort.equals(sorts[2])){
+            mMovies = DBOperator.getInstance(getContext()).getFavorites();
+            showData(mMovies);
+        }else {
+
+            loadRemoteData();
+        }
+    }
+
+    protected void loadRemoteData() {
 
         new Thread(){
             @Override

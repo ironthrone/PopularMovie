@@ -7,5 +7,5 @@
         android:defaultValue="@string/pref_default_sort_by"
         android:icon="@drawable/ic_sort"
         android:entries="@array/pref_sort_entries"
-        android:entryValues="@array/pref_sort_value_entries"/>
+        android:entryValues="@array/pref_sort_entries_value"/>
 </PreferenceScreen>

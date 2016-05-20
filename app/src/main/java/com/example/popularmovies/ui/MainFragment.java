@@ -74,6 +74,10 @@ public class MainFragment extends Fragment {
         outState.putSerializable("data",(ArrayList)mMovies);
     }
 
+    /**
+     * load data , may come from remote or local database
+     * @param sort
+     */
     private void loadData(String sort){
         String[] sorts = getResources().getStringArray(R.array.pref_sort_entries_value);
         if(sort.equals(sorts[2])){
@@ -85,6 +89,9 @@ public class MainFragment extends Fragment {
         }
     }
 
+    /**
+     * popular,top_rated from remote
+     */
     protected void loadRemoteData() {
 
         new Thread(){

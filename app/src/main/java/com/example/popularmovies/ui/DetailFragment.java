@@ -7,12 +7,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.popularmovies.Constants;
 import com.example.popularmovies.R;
@@ -55,6 +59,12 @@ public class DetailFragment extends Fragment {
     private List<Review> mReviews = new ArrayList<>();
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail,container,false);
@@ -86,6 +96,30 @@ public class DetailFragment extends Fragment {
         showData();
         getTrailer();
         getReviews();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail_fragment,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.share){
+            if(mTrailers.size() >= 0) {
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_TEXT,"https://www.youtube.com/watch?v=" + mTrailers.get(0).key);
+            intent.setType("text/plain");
+            startActivity(intent);
+            }else {
+                Toast.makeText(getActivity(), "Nothing to share", Toast.LENGTH_SHORT).show();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void getReviews() {
@@ -215,7 +249,5 @@ public class DetailFragment extends Fragment {
             }
         }
     }
-
-
 
 }
